@@ -111,7 +111,7 @@ def clean(s):
     if not s:
         return ""
     s = s.replace("\r", " ").replace("\n", " ")
-    s = s.replace("—", ", ").replace("–", "-")
+    s = s.replace("\u2014", ", ").replace("\u2013", "-")  # source text: swap em and en dashes
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
