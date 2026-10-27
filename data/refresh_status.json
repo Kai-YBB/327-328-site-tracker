@@ -1,7 +1,7 @@
 {
-  "result": "failed",
-  "ranAt": "2026-10-27T19:09:46+00:00",
+  "result": "ok",
+  "ranAt": "2026-10-27T19:14:09+00:00",
   "trigger": "push",
-  "runUrl": "https://github.com/Kai-YBB/327-328-site-tracker/actions/runs/40566560239",
-  "logTail": "Boston Planning query error: {'code': 499, 'message': 'Token Required', 'details': []}\n"
+  "runUrl": "https://github.com/Kai-YBB/327-328-site-tracker/actions/runs/40567229614",
+  "logTail": "wrote /home/runner/work/327-328-site-tracker/327-328-site-tracker/data/sites.json\nsites 160 {'Boston': 108, 'Cambridge': 33, 'Somerville': 19} Counter({'327': 87, '328': 73})\nlabor Counter({None: 151, 'open': 6, 'union': 3})\n"
 }
