@@ -1,17 +1,27 @@
 # Weekly refresh of the site list.
+#
 # Runs scripts/build_data.py, which pulls the latest Boston, Cambridge and
-# Somerville open data. If the data changed, it commits data/sites.json and
-# GitHub Pages republishes the site on its own.
-# If a source is down or returns broken data, the script stops, nothing is
-# committed, and this run shows as failed. The weekly Claude maintenance task
-# checks for failed runs and fixes the script (see MAINTENANCE.md).
+# Somerville open data and saves data/sites.json. GitHub Pages republishes the
+# site on its own after every commit.
+#
+# Every run, pass or fail, also saves data/refresh_status.json with the result
+# and the end of the log. The weekly Claude task reads that file to see whether
+# the script needs fixing (see WEEKLY_CLAUDE_TASK.md).
+#
+# If a source is down or returns broken data, the script stops before writing,
+# so the site keeps last week's data.
 
 name: Refresh site data
 
 on:
   schedule:
-    - cron: "17 10 * * 1"   # Mondays, 10:17 UTC (6:17 AM Boston time in summer, 5:17 AM in winter)
-  workflow_dispatch: {}      # lets you run it by hand from the Actions tab
+    - cron: "17 10 * * 1"        # Mondays 10:17 UTC (6:17 AM Boston in summer, 5:17 AM in winter)
+  workflow_dispatch: {}           # "Run workflow" button on the Actions tab
+  push:
+    branches: [main]
+    paths:                        # re-test right away when the script or this file changes
+      - "scripts/**"
+      - ".github/workflows/refresh.yml"
 
 permissions:
   contents: write
@@ -32,16 +42,43 @@ jobs:
           python-version: "3.12"
 
       - name: Build data/sites.json from live open data
-        run: python3 scripts/build_data.py
-
-      - name: Commit if the data changed
+        id: build
         run: |
-          if git diff --quiet -- data/sites.json; then
-            echo "No changes this week."
-            exit 0
-          fi
+          set -o pipefail
+          python3 scripts/build_data.py 2>&1 | tee build.log
+
+      - name: Save run result to data/refresh_status.json
+        if: always()
+        env:
+          RESULT: ${{ steps.build.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          TRIGGER: ${{ github.event_name }}
+        run: |
+          python3 - <<'PY'
+          import json, os, datetime
+          log = open("build.log").read() if os.path.exists("build.log") else ""
+          status = {
+              "result": "ok" if os.environ["RESULT"] == "success" else "failed",
+              "ranAt": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+              "trigger": os.environ["TRIGGER"],
+              "runUrl": os.environ["RUN_URL"],
+              "logTail": log[-4000:],
+          }
+          json.dump(status, open("data/refresh_status.json", "w"), indent=2)
+          print(json.dumps({k: v for k, v in status.items() if k != "logTail"}))
+          PY
+
+      - name: Commit results
+        if: always()
+        run: |
           git config user.name "site-data-bot"
           git config user.email "site-data-bot@users.noreply.github.com"
-          git add data/sites.json
-          git commit -m "Weekly site data refresh $(date -u +%Y-%m-%d)"
-          git push
+          git add data/refresh_status.json
+          if [ "${{ steps.build.outcome }}" = "success" ]; then git add data/sites.json; fi
+          if git diff --cached --quiet; then echo "Nothing to commit."; exit 0; fi
+          git commit -m "Site data refresh $(date -u +%Y-%m-%d): ${{ steps.build.outcome }}"
+          for i in 1 2 3; do
+            git pull --rebase --quiet origin main && git push && exit 0
+            sleep 5
+          done
+          exit 1

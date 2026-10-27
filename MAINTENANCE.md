@@ -1,17 +1,17 @@
-# Weekly maintenance
+# Maintenance steps
 
-A scheduled Claude task follows these steps once a week, after the Monday
-data refresh. A person can follow the same steps by hand.
+Detailed steps behind WEEKLY_CLAUDE_TASK.md. A person can follow them by hand too.
 
 ## 1. Check the data refresh
 
-1. Look at the latest run of the "Refresh site data" workflow (GitHub, Actions tab).
-2. If it succeeded, go to step 2.
+1. Open `data/refresh_status.json`. The workflow saves it after every run, with the
+   result and the end of the log. The full log is at its `runUrl` (GitHub, Actions tab).
+2. If `result` is `ok`, go to step 2.
 3. If it failed, read the log. The script stops on purpose when a source is
    down or returns broken data, so the site keeps last week's data.
    - Source temporarily down (timeout, 5xx error): note it in the report and stop. Next week's run will retry.
    - Source changed (field renamed, new dataset id, new URL): fix `scripts/build_data.py`,
-     test it, commit, and run the workflow again from the Actions tab.
+     commit, and push. The workflow re-runs on its own when the script changes.
    - Cambridge publishes a new Development Log dataset every quarter. The script
      finds it by name ("Development Log Current Edition YYYY Qn"). If Cambridge
      renames it, update the pattern in the `cambridge()` function.
@@ -48,11 +48,13 @@ https://www.boston.gov/departments/small-business-development/boston-employment-
 
 ## 3. Test and publish
 
-1. Run `python3 scripts/build_data.py`. It must finish with "wrote data/sites.json".
-2. Open `index.html` through a local web server and check that the list and map load
-   with no errors in the browser console.
-3. Commit with a message that lists what changed, and push. GitHub Pages republishes
-   within a few minutes.
+1. If your computer can reach the city data sites, run `python3 scripts/build_data.py`.
+   It must finish with "wrote data/sites.json". If it cannot (a Claude cloud session
+   usually cannot), run `python3 -m py_compile scripts/build_data.py` instead and let
+   the workflow do the real test.
+2. Commit with a message that lists what changed, and push. The workflow rebuilds
+   the data, and GitHub Pages republishes within a few minutes.
+3. Check that `data/refresh_status.json` updates with `result: ok`.
 
 ## 4. Report
 
