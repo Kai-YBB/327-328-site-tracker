@@ -41,21 +41,27 @@ def get_json(url, cache_name):
     sys.exit(f"FETCH FAILED: {url}\n  {last}")
 
 
-A80_URL = "https://gis.bostonplans.org/hosting/rest/services/Hosted/A80_project_points_all/FeatureServer/0/query"
-A80_FIELDS = ("project_id,project__project_name,project_street_number,project_street_name,project_street_suffix,"
-              "neighborhood,project_zip_code,project_status,project__record_type,last_filed_date,"
-              "last_board_approved_date,coo_permit_date,total_residential_units,gross_square_footage,"
-              "description,website_url,longitude,latitude,total_development_cost,display_on_web")
+# Boston Planning Department project points. The "_display" layer is public.
+# The "_all" layer (which also has cost and occupancy-permit dates) started
+# requiring a login in October 2026; it is tried only if "_display" fails.
+A80_URLS = [
+    "https://gis.bostonplans.org/hosting/rest/services/Hosted/A80_project_points_display/FeatureServer/0/query",
+    "https://gis.bostonplans.org/hosting/rest/services/Hosted/A80_project_points_all/FeatureServer/0/query",
+]
 
 
 def a80(where, cache_name):
-    q = urllib.parse.urlencode({"where": where, "outFields": A80_FIELDS, "returnGeometry": "false", "f": "json"})
-    r = get_json(A80_URL + "?" + q, cache_name)
-    if "error" in r:
-        sys.exit(f"Boston Planning query error: {r['error']}")
-    if r.get("exceededTransferLimit"):
-        sys.exit("Boston Planning query returned too many records; add paging.")
-    return r["features"]
+    errors = []
+    for url in A80_URLS:
+        q = urllib.parse.urlencode({"where": where, "outFields": "*", "returnGeometry": "false", "f": "json"})
+        r = get_json(url + "?" + q, cache_name)
+        if "error" in r:
+            errors.append(f"{url.split('/Hosted/')[1].split('/')[0]}: {r['error']}")
+            continue
+        if r.get("exceededTransferLimit"):
+            sys.exit("Boston Planning query returned too many records; add paging.")
+        return r["features"]
+    sys.exit("Boston Planning query error: " + " | ".join(errors))
 
 
 # ---------------------------------------------------------------- sources
