@@ -126,7 +126,6 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(34px, 
 .card.is-sel { outline: 3px solid var(--sel); outline-offset: 1px; }
 .card-top { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; color: var(--muted); }
 .local-chip { font-family: var(--font-mono); font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 3px; color: var(--surface); background: var(--lc); letter-spacing: .02em; }
-.dist { margin-left: auto; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink); }
 .card h3 { margin: 0; font-size: 19px; line-height: 1.2; font-weight: 700; text-wrap: balance; overflow-wrap: anywhere; }
 .addr { margin: -4px 0 0; font-family: var(--font-mono); font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -188,10 +187,8 @@ svg.map { width: 100%; height: 100%; display: block; touch-action: manipulation;
 .map .dot.l328 { fill: var(--l328); }
 .map .dot.visited { stroke: var(--ink); stroke-width: 2; }
 .map .dot.sel { stroke: var(--ink); stroke-width: 3; }
-.map .dot.route { stroke: var(--ink); stroke-width: 2.2; stroke-dasharray: 2 2; }
 .map .home { fill: var(--ink); }
 .map .homelab { fill: var(--ink); font-family: var(--font-mono); font-weight: 600; pointer-events: none; }
-.map .routeline { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
 .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--paper); font-size: 12.5px; padding: 5px 8px; border-radius: 4px; max-width: 240px; transform: translate(-50%, calc(-100% - 10px)); white-space: normal; z-index: 3; }
 .titleblock { display: grid; grid-template-columns: 1fr auto; gap: 0; border-top: 1px solid var(--ink); font-family: var(--font-mono); font-size: 11.5px; }
 .titleblock > div { padding: 6px 10px; border-right: 1px solid var(--ink); min-width: 0; }
@@ -201,14 +198,6 @@ svg.map { width: 100%; height: 100%; display: block; touch-action: manipulation;
 .sw.b { background: var(--l327); } .sw.o { background: var(--l328); }
 .sw.sq { border-radius: 1px; background: var(--ink); }
 
-/* Route bar */
-.routebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--ink); color: var(--paper);
-  padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
-  display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: center; }
-.routebar[hidden] { display: none; }
-.routebar .btn { background: transparent; color: var(--paper); border-color: rgba(255,255,255,.4); }
-.routebar .btn.primary { background: var(--paper); color: var(--ink); border-color: var(--paper); }
-.routebar .stops { font-size: 14px; max-width: 70ch; }
 
 /* Panel (log form) */
 .scrim { position: fixed; inset: 0; background: rgba(10,12,14,.45); z-index: 40; }
@@ -274,7 +263,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
   <header class="masthead">
     <div class="eyebrow">Carpenters Local 327 and Local 328 territory</div>
     <h1>Boston Carpentry Site Tracker</h1>
-    <p class="lede">Active construction sites in Carpenters Local 327 and Local 328 territory, with contractor union records from Boston Employment Commission documents. Filter the list, sort by distance from a union hall, and open directions or a multi-stop route in Google Maps.</p>
+    <p class="lede">Active construction sites in Carpenters Local 327 and Local 328 territory, with contractor union records from Boston Employment Commission documents. Filter the list, see each site on the map, and open directions in Google Maps.</p>
     <div class="stamp" id="stamp">Loading site data...</div>
   </header>
 
@@ -334,18 +323,10 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
         <div class="field">
           <label for="f-sort">Sort</label>
           <select id="f-sort">
-            <option value="near">Nearest first</option>
+            <option value="area">Area A to Z</option>
             <option value="big">Biggest first</option>
             <option value="new">Most recently approved</option>
-            
             <option value="name">Name A to Z</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="f-from">Distance from</label>
-          <select id="f-from">
-            <option value="l327">Local 327 hall (Dorchester)</option>
-            <option value="l328">Local 328 hall (Cambridge)</option>
           </select>
         </div>
         <button class="btn ghost" id="f-reset" type="button">Reset filters</button>
@@ -441,11 +422,6 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
   </section>
 </div>
 
-<div class="routebar" id="routebar" hidden>
-  <span class="stops" id="route-text"></span>
-  <a class="btn primary" id="route-go" href="#" target="_blank" rel="noopener">Open route in Google Maps</a>
-  <button class="btn" id="route-clear" type="button">Clear route</button>
-</div>
 
 <div class="toast" id="toast" hidden role="status"></div>
 
@@ -471,12 +447,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
     return "$" + Math.round(v / 1e3) + "K";
   }
   const fmtNum = (n) => Number(n).toLocaleString("en-US");
-  function miles(a, b) {
-    const R = 3958.8, toR = Math.PI / 180;
-    const dLat = (b.lat - a.lat) * toR, dLng = (b.lng - a.lng) * toR;
-    const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * toR) * Math.cos(b.lat * toR) * Math.sin(dLng / 2) ** 2;
-    return 2 * R * Math.asin(Math.sqrt(h));
-  }
+
   const STOP = new Set(["inc", "llc", "corp", "corporation", "co", "company", "ltd", "the", "construction", "builders", "building", "contracting", "contractors", "contractor", "general", "group", "services", "associates", "and", "of"]);
   function norm(name) {
     let s = String(name || "").toLowerCase();
@@ -506,7 +477,6 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
     nav: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 7.5 14 2l-5.5 12-1.6-4.9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
     ext: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 2h5v5M14 2 7 9M12 9.5V14H2V4h4.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     pen: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 14l1-4 8-8 3 3-8 8zM9.5 3.5l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
-    route: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="3.5" cy="12.5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12.5" cy="3.5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 12.5h4a3 3 0 0 0 0-6h-3a3 3 0 0 1 0-6h4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     check: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5 5 9l5-6" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
   };
 
@@ -516,10 +486,9 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
   const cstat = new Map();     // contractor key -> status doc
   const mysites = new Map();   // id -> site doc
   let db = null, dbState = "connecting", canWrite = null;
-  const F = Object.assign({ q: "", local: "", area: "", stage: "", union: "", visit: "", size: "", sort: "near", from: "l327", contractor: "" }, store.get("filters", {}), { visit: "" });
+  const F = Object.assign({ q: "", local: "", area: "", stage: "", union: "", visit: "", size: "", sort: "area", contractor: "" }, store.get("filters", {}), { visit: "" });
+  if (!["area", "big", "new", "name"].includes(F.sort)) F.sort = "area";
   F.contractor = "";
-  if (F.from !== "l327" && F.from !== "l328") F.from = "l327";
-  let route = store.get("route", []);
   let selectedId = null;
   let mapCollapsed = store.get("mapCollapsed", window.matchMedia("(max-width: 999px)").matches);
 
@@ -607,8 +576,6 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
     const L = logs.get(s.id) || {};
     return { project: s.labor, union, open, you, siteYou: L.union || "" };
   }
-  function startPoint() { return DATA.points[F.from] || DATA.points.l327; }
-  function distOf(s) { return s.lat == null ? null : miles(startPoint(), s); }
 
   function filtered() {
     const q = F.q.trim().toLowerCase();
@@ -646,17 +613,16 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
       }
       res.push(s);
     }
-    const d = new Map(res.map((s) => [s.id, distOf(s)]));
     const big = (s) => (s.sqft || 0) * 400 + (s.cost || 0);
     const cmp = {
-      near: (a, b) => (d.get(a.id) ?? 1e9) - (d.get(b.id) ?? 1e9),
+      area: (a, b) => (a.city + a.area).localeCompare(b.city + b.area),
       big: (a, b) => big(b) - big(a),
       new: (a, b) => String(b.approved || b.permitIssued || "").localeCompare(String(a.approved || a.permitIssued || "")),
       visit: (a, b) => String((logs.get(b.id) || {}).date || "").localeCompare(String((logs.get(a.id) || {}).date || "")),
       name: (a, b) => a.name.localeCompare(b.name),
     }[F.sort] || ((a, b) => 0);
     res.sort((a, b) => cmp(a, b) || a.name.localeCompare(b.name));
-    return { list: res, dist: d };
+    return { list: res };
   }
 
   // ---------- render: sites ----------
@@ -680,7 +646,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
     const dest = s.lat != null ? s.lat + "," + s.lng : s.address;
     return "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(dest);
   }
-  function cardHTML(s, dist) {
+  function cardHTML(s) {
     const L = logs.get(s.id) || {};
     const R = siteRecords(s);
     const chips = [];
@@ -715,7 +681,6 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
       ? '<div class="steward"><span class="lbl">Foreman</span><strong>' + esc(L.foremanName) + "</strong>" + (L.foremanPhone ? '<span class="copyrow"><span class="mono">' + esc(L.foremanPhone) + '</span><button class="copy" type="button" data-copy="' + esc(L.foremanPhone) + '">Copy</button></span>' : "") + "</div>"
       : "";
 
-    const inRoute = route.includes(s.id);
     const more = [];
     if (s.desc) more.push("<p>" + esc(s.desc) + "</p>");
     if (L.notes) more.push('<p><strong>Your notes:</strong> ' + esc(L.notes) + "</p>");
@@ -730,7 +695,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
     if (L.updatedAt) more.push('<p class="src">Your log last saved ' + esc(fmtDate(L.updatedAt)) + "</p>");
 
     return '<article class="card' + (s.id === selectedId ? " is-sel" : "") + '" id="c-' + esc(s.id) + '" data-id="' + esc(s.id) + '" data-local="' + esc(s.local) + '">' +
-      '<div class="card-top"><span class="local-chip">Local ' + esc(s.local) + "</span><span>" + esc(areaLabel(s)) + '</span><span class="dist">' + (dist == null ? "distance n/a" : dist.toFixed(1) + " mi") + "</span></div>" +
+      '<div class="card-top"><span class="local-chip">Local ' + esc(s.local) + "</span><span>" + esc(areaLabel(s)) + "</span></div>" +
       "<h3>" + esc(s.name) + "</h3>" +
       '<p class="addr">' + esc(s.address) + "</p>" +
       '<div class="chips">' + chips.join("") + "</div>" +
@@ -740,7 +705,6 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
       '<div class="actions">' +
         '<a class="btn" href="' + esc(directionsUrl(s)) + '" target="_blank" rel="noopener">' + ICON.nav + "Directions</a>" +
         (s.link ? '<a class="btn" href="' + esc(s.link) + '" target="_blank" rel="noopener">' + ICON.ext + esc(s.linkLabel || "Source") + "</a>" : "") +
-        '<button class="btn" type="button" data-act="route" aria-pressed="' + inRoute + '">' + ICON.route + (inRoute ? "In route" : "Add to route") + "</button>" +
       "</div>" +
       (more.length ? '<details class="more"' + (s.id === selectedId ? " open" : "") + "><summary>Details and sources</summary><div class=\"more-body\">" + more.join("") + "</div></details>" : "") +
       "</article>";
@@ -748,19 +712,18 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
 
   let lastFiltered = [];
   function renderSites() {
-    const { list, dist } = filtered();
+    const { list } = filtered();
     lastFiltered = list;
     const box = $("#list");
     if (!list.length) {
       box.innerHTML = '<div class="empty-list">No sites match these filters. <button class="linkbtn" type="button" id="empty-reset">Reset filters</button></div>';
       const b = $("#empty-reset"); if (b) b.addEventListener("click", resetFilters);
     } else {
-      box.innerHTML = list.map((s) => cardHTML(s, dist.get(s.id))).join("");
+      box.innerHTML = list.map((s) => cardHTML(s)).join("");
     }
     renderSummary(list);
     renderActiveFilters();
     renderDots(list);
-    renderRoute();
     $("#tc-sites").textContent = list.length;
   }
   function renderSummary(list) {
@@ -796,7 +759,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
   let MAP = null, fullVB = null, vb = null;
   function proj(lat, lng) { return [(lng - MAP.lngMin) * MAP.kx * MAP.scale, (MAP.latMax - lat) * MAP.scale]; }
   function el(tag, attrs) { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
-  let gShapes, gLabels, gRoute, gDots, gHome;
+  let gShapes, gLabels, gDots, gHome;
   function buildMap() {
     MAP = DATA.map;
     fullVB = [0, 0, MAP.w, MAP.h];
@@ -804,7 +767,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
     const svg = $("#map");
     svg.setAttribute("viewBox", vb.join(" "));
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-    gShapes = el("g", {}); gLabels = el("g", {}); gRoute = el("g", {}); gDots = el("g", {}); gHome = el("g", {});
+    gShapes = el("g", {}); gLabels = el("g", {}); gDots = el("g", {}); gHome = el("g", {});
     for (const sh of MAP.shapes) {
       const p = el("path", { d: sh.d, class: "shape " + (sh.local ? "l" + sh.local : "ctx") });
       const t = el("title", {}); t.textContent = sh.name + (sh.local ? ", Local " + sh.local : ", outside 327 and 328");
@@ -816,7 +779,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
         gLabels.appendChild(lab);
       }
     }
-    svg.append(gShapes, gLabels, gRoute, gDots, gHome);
+    svg.append(gShapes, gLabels, gDots, gHome);
     applyZoomStyles();
     if (window.ResizeObserver) new ResizeObserver(() => { applyZoomStyles(); renderDots(lastFiltered); }).observe($("#svgwrap"));
   }
@@ -881,19 +844,10 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
       const r = (s.size === "Large" ? 5.5 : 4) * u * (s.id === selectedId ? 1.5 : 1);
       const cls = ["dot", "l" + s.local];
       if (L.status === "visited") cls.push("visited");
-      if (route.includes(s.id)) cls.push("route");
       if (s.id === selectedId) cls.push("sel");
       const c = el("circle", { cx: x.toFixed(1), cy: y.toFixed(1), r: r.toFixed(2), class: cls.join(" "), "data-id": s.id, tabindex: "0", role: "button", "aria-label": s.name });
       gDots.appendChild(c);
     }
-    renderRouteLine();
-  }
-  function renderRouteLine() {
-    gRoute.textContent = "";
-    const stops = orderedRoute();
-    const pts = [startPoint()].concat(stops).filter((s) => s.lat != null).map((s) => proj(s.lat, s.lng));
-    if (pts.length < 2) return;
-    gRoute.appendChild(el("path", { d: "M" + pts.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).join("L"), class: "routeline" }));
   }
   function showTip(target) {
     const id = target.getAttribute("data-id");
@@ -919,40 +873,6 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
         card.classList.add("flash");
       }
     }
-  }
-
-  // ---------- route ----------
-  function orderedRoute() {
-    const sites = allSites();
-    const stops = route.map((id) => sites.find((s) => s.id === id)).filter(Boolean);
-    const withC = stops.filter((s) => s.lat != null), without = stops.filter((s) => s.lat == null);
-    const out = [];
-    let cur = startPoint();
-    const left = withC.slice();
-    while (left.length) {
-      let bi = 0, bd = Infinity;
-      left.forEach((s, i) => { const d = miles(cur, s); if (d < bd) { bd = d; bi = i; } });
-      cur = left.splice(bi, 1)[0];
-      out.push(cur);
-    }
-    return out.concat(without);
-  }
-  function renderRoute() {
-    const bar = $("#routebar");
-    const sites = allSites();
-    route = route.filter((id) => sites.some((s) => s.id === id));
-    if (!route.length) { bar.hidden = true; return; }
-    const stops = orderedRoute();
-    const start = startPoint();
-    const use = stops.slice(0, 10);
-    const loc = (s) => (s.lat != null ? s.lat + "," + s.lng : s.address);
-    const dest = use[use.length - 1];
-    const way = use.slice(0, -1).map(loc).join("|");
-    let url = "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(start.lat + "," + start.lng) + "&destination=" + encodeURIComponent(loc(dest));
-    if (way) url += "&waypoints=" + encodeURIComponent(way);
-    $("#route-go").href = url;
-    $("#route-text").textContent = stops.length + (stops.length === 1 ? " stop" : " stops") + " from " + start.name + ": " + use.map((s) => s.name).join(", ") + (stops.length > 10 ? ". Google Maps takes 10 stops, so only the first 10 are used." : "");
-    bar.hidden = false;
   }
 
   // ---------- contractors tab ----------
@@ -1037,11 +957,11 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
   }
   function syncControls() {
     $("#f-q").value = F.q; $("#f-local").value = F.local; $("#f-stage").value = F.stage; $("#f-union").value = F.union;
-$("#f-size").value = F.size; $("#f-sort").value = F.sort; $("#f-from").value = F.from;
+$("#f-size").value = F.size; $("#f-sort").value = F.sort;
   }
   function saveFilters() { const { contractor, ...rest } = F; store.set("filters", rest); }
   function resetFilters() {
-    Object.assign(F, { q: "", local: "", area: "", stage: "", union: "", visit: "", size: "", sort: "near", contractor: "" });
+    Object.assign(F, { q: "", local: "", area: "", stage: "", union: "", visit: "", size: "", sort: "area", contractor: "" });
     syncControls(); fillAreas(); saveFilters(); renderSites();
   }
 
@@ -1067,7 +987,7 @@ $("#f-size").value = F.size; $("#f-sort").value = F.sort; $("#f-from").value = F
   function bind() {
     const deb = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
     $("#f-q").addEventListener("input", deb(() => { F.q = $("#f-q").value; saveFilters(); renderSites(); }, 160));
-    for (const [id, key] of [["#f-local", "local"], ["#f-area", "area"], ["#f-stage", "stage"], ["#f-union", "union"], ["#f-size", "size"], ["#f-sort", "sort"], ["#f-from", "from"]]) {
+    for (const [id, key] of [["#f-local", "local"], ["#f-area", "area"], ["#f-stage", "stage"], ["#f-union", "union"], ["#f-size", "size"], ["#f-sort", "sort"]]) {
       $(id).addEventListener("change", () => {
         F[key] = $(id).value;
         if (key === "local" && F.area) { const s = allSites().find((x) => x.area === F.area); if (s && F.local && s.local !== F.local) { F.area = ""; } fillAreas(); }
@@ -1085,10 +1005,6 @@ $("#f-size").value = F.size; $("#f-sort").value = F.sort; $("#f-from").value = F
       const card = btn.closest(".card"); const id = card.dataset.id;
       const s = allSites().find((x) => x.id === id);
       if (!s) return;
-      if (btn.dataset.act === "route") {
-        route = route.includes(id) ? route.filter((x) => x !== id) : route.concat(id);
-        store.set("route", route); renderSites();
-      }
     });
     $("#lgrid").addEventListener("click", (e) => { const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
 
@@ -1105,7 +1021,6 @@ $("#f-size").value = F.size; $("#f-sort").value = F.sort; $("#f-from").value = F
       mapCollapsed = !mapCollapsed; store.set("mapCollapsed", mapCollapsed); applyMapCollapsed();
     });
 
-    $("#route-clear").addEventListener("click", () => { route = []; store.set("route", route); renderSites(); });
 
     $("#c-q").addEventListener("input", deb(renderContractors, 150));
     $("#c-f").addEventListener("change", renderContractors);
