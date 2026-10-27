@@ -4,7 +4,8 @@ A scheduled Claude task runs this every Monday afternoon, a few hours after the
 "Refresh site data" workflow. Edit this file to change what the weekly task does;
 the schedule itself only says "follow WEEKLY_CLAUDE_TASK.md".
 
-Read CLAUDE.md first. Its content rules apply to everything below.
+Read CLAUDE.md first. Its content rules and cost rule apply to everything below.
+Use only free tools: the built-in web fetch tool, never Firecrawl or other paid connectors.
 
 ## 1. Check this week's data refresh
 
@@ -34,7 +35,7 @@ Follow MAINTENANCE.md step 2. In short:
 1. Open https://www.boston.gov/departments/small-business-development/boston-employment-commission
    with the web fetch tool and list minutes and agendas newer than the newest
    entry in the `BEC` dictionary in `scripts/build_data.py`.
-2. Read each new document with the web fetch or Firecrawl tool.
+2. Read each new document with the web fetch tool.
 3. Add the document to `BEC`, then add or update each project and contractor
    record it supports.
 4. If there are no new documents, change nothing.

@@ -30,5 +30,14 @@ Commission (BEC) documents.
 ## Network note
 
 A Claude cloud session's shell usually cannot reach the city data sites. Fetch
-city pages and PDFs with the web fetch or Firecrawl tools instead, and let the
-GitHub workflow run the script itself.
+city pages and PDFs with the free web fetch tool instead, and let the GitHub
+workflow run the script itself.
+
+## Cost rule
+
+Nothing in this project may cost Kai money beyond his regular Claude plan.
+- Use only the built-in web fetch and web search tools. Do not use Firecrawl or
+  any other connector that bills per use, even if it is available.
+- Do not add paid services, paid GitHub features, or API keys.
+- If a step cannot be done without something that costs money, skip it and say
+  so in the report so Kai can decide.
