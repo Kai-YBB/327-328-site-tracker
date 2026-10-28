@@ -1,6 +1,6 @@
 # Maintenance steps
 
-Detailed steps behind WEEKLY_CLAUDE_TASK.md. A person can follow them by hand too.
+Detailed steps behind WEEKLY_TASK.md. A person can follow them by hand too.
 
 ## 1. Check the data refresh
 
@@ -49,7 +49,7 @@ https://www.boston.gov/departments/small-business-development/boston-employment-
 ## 3. Test and publish
 
 1. If your computer can reach the city data sites, run `python3 scripts/build_data.py`.
-   It must finish with "wrote data/sites.json". If it cannot (a Claude cloud session
+   It must finish with "wrote data/sites.json". If it cannot (a cloud session
    usually cannot), run `python3 -m py_compile scripts/build_data.py` instead and let
    the workflow do the real test.
 2. Commit with a message that lists what changed, and push. The workflow rebuilds

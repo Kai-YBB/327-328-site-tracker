@@ -1,10 +1,10 @@
-# Weekly Claude task
+# Weekly maintenance task
 
-A scheduled Claude task runs this every Monday afternoon, a few hours after the
+A scheduled task runs this every Monday afternoon, a few hours after the
 "Refresh site data" workflow. Edit this file to change what the weekly task does;
-the schedule itself only says "follow WEEKLY_CLAUDE_TASK.md".
+the schedule itself only says "follow WEEKLY_TASK.md".
 
-Read CLAUDE.md first. Its content rules and cost rule apply to everything below.
+Read CONTENT_RULES.md first. Its content rules and cost rule apply to everything below.
 Use only free tools: the built-in web fetch tool, never Firecrawl or other paid connectors.
 
 ## 1. Check this week's data refresh

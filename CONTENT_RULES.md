@@ -1,4 +1,4 @@
-# Notes for Claude working in this repository
+# Content rules and project notes
 
 This is the public Boston Carpentry Site Tracker for YouthBuild Boston's resource
 page: a list and map of active construction sites in Carpenters Local 327 and
@@ -24,18 +24,18 @@ Commission (BEC) documents.
 - `.github/workflows/refresh.yml` runs the script every Monday and after any change
   to the script, and saves the result to `data/refresh_status.json`.
 - `index.html` is the whole site. It loads `data/sites.json` and `data/map.json`.
-- `WEEKLY_CLAUDE_TASK.md` is the weekly maintenance job. `MAINTENANCE.md` has the
+- `WEEKLY_TASK.md` is the weekly maintenance job. `MAINTENANCE.md` has the
   detailed steps it follows.
 
 ## Network note
 
-A Claude cloud session's shell usually cannot reach the city data sites. Fetch
+A cloud session's shell usually cannot reach the city data sites. Fetch
 city pages and PDFs with the free web fetch tool instead, and let the GitHub
 workflow run the script itself.
 
 ## Cost rule
 
-Nothing in this project may cost Kai money beyond his regular Claude plan.
+Nothing in this project may cost Kai money beyond his existing subscriptions.
 - Use only the built-in web fetch and web search tools. Do not use Firecrawl or
   any other connector that bills per use, even if it is available.
 - Do not add paid services, paid GitHub features, or API keys.

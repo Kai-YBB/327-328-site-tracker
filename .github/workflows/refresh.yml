@@ -5,8 +5,8 @@
 # site on its own after every commit.
 #
 # Every run, pass or fail, also saves data/refresh_status.json with the result
-# and the end of the log. The weekly Claude task reads that file to see whether
-# the script needs fixing (see WEEKLY_CLAUDE_TASK.md).
+# and the end of the log. The weekly maintenance task reads that file to see
+# whether the script needs fixing (see WEEKLY_TASK.md).
 #
 # If a source is down or returns broken data, the script stops before writing,
 # so the site keeps last week's data.

@@ -11,7 +11,7 @@ records from Boston Employment Commission documents.
   Log and Somerville building permits, then saves `data/sites.json`. GitHub Pages
   republishes the site on its own.
 - Every run saves its result to `data/refresh_status.json`.
-- **Every Monday afternoon**, a scheduled Claude task follows `WEEKLY_CLAUDE_TASK.md`:
+- **Every Monday afternoon**, a scheduled maintenance task follows `WEEKLY_TASK.md`:
   it checks that file, fixes the script if a source changed, and adds new Boston
   Employment Commission records.
 
@@ -25,9 +25,9 @@ records from Boston Employment Commission documents.
 | `scripts/build_data.py` | Pulls live data and builds `data/sites.json`. Hand-entered records are in its sections marked MANUAL RECORDS. |
 | `data/refresh_status.json` | Result of the latest data refresh. |
 | `.github/workflows/refresh.yml` | The weekly refresh schedule. |
-| `WEEKLY_CLAUDE_TASK.md` | What the weekly Claude task does. Edit this to change it. |
+| `WEEKLY_TASK.md` | What the weekly maintenance task does. Edit this to change it. |
 | `MAINTENANCE.md` | Detailed maintenance steps. |
-| `CLAUDE.md` | Content rules for anyone, person or Claude, editing the records. |
+| `CONTENT_RULES.md` | Content and cost rules for anyone editing the records. |
 
 ## Data sources
 
