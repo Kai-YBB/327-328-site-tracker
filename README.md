@@ -1,8 +1,13 @@
-# Boston Carpentry Site Tracker
+# Construction Sites in Carpenters Local 327 and 328 Territory
 
 A public map and list of active construction sites in Carpenters Local 327 and
-Local 328 territory (Boston, Cambridge and Somerville), with contractor union
-records from Boston Employment Commission documents.
+Local 328 territory (Boston, Cambridge and Somerville), union or not, with
+contractor union records from Boston Employment Commission documents.
+
+Most sites have no public record of union status. The page marks a site union
+or open shop only when a record says so, labels every other site "Union status
+not verified", and shows the counts at the top. "Local 327 area" or "Local 328
+area" means the site is in that local's territory, not that the job is union.
 
 ## How it stays current
 

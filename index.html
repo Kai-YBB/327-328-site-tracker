@@ -1,4 +1,4 @@
-<title>Boston Carpentry Site Tracker</title>
+<title>Construction Sites in Carpenters Local 327 and 328 Territory</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
@@ -260,9 +260,10 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
 
 <div class="wrap">
   <header class="masthead">
-    <div class="eyebrow">Carpenters Local 327 and Local 328 territory</div>
-    <h1>Boston Carpentry Site Tracker</h1>
-    <p class="lede">Active construction sites in Carpenters Local 327 and Local 328 territory, with contractor union records from Boston Employment Commission documents. Filter the list, see each site on the map, and open directions in Google Maps.</p>
+    <div class="eyebrow">Union and non-union sites. Union status is not verified unless marked.</div>
+    <h1>Construction Sites in Carpenters Local 327 and 328 Territory</h1>
+    <p class="lede">Every active construction site found in public records in Carpenters Local 327 and Local 328 territory, union or not. A site is marked union or open shop only when a Boston Employment Commission record says so. Filter the list, see each site on the map, and open directions in Google Maps.</p>
+    <div class="notice" id="union-note">Loading union status counts...</div>
     <div class="stamp" id="stamp">Loading site data...</div>
   </header>
 
@@ -283,8 +284,8 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
           <input id="f-q" type="search" placeholder="Name, street, contractor, developer" autocomplete="off">
         </div>
         <div class="field">
-          <label for="f-local">Local</label>
-          <select id="f-local"><option value="">Both locals</option><option value="327">Local 327</option><option value="328">Local 328</option></select>
+          <label for="f-local">Local area</label>
+          <select id="f-local"><option value="">Both areas</option><option value="327">Local 327 area</option><option value="328">Local 328 area</option></select>
         </div>
         <div class="field">
           <label for="f-area">Area</label>
@@ -302,13 +303,13 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
       </div>
       <div class="filter-row">
         <div class="field">
-          <label for="f-union">Union records</label>
+          <label for="f-union">Union status</label>
           <select id="f-union">
-            <option value="">Any</option>
+            <option value="">All sites</option>
             <option value="any">Any union record</option>
             <option value="project">Project listed union</option>
             <option value="open">Open shop record</option>
-            <option value="none">No record yet</option>
+            <option value="none">Not verified (no record)</option>
           </select>
         </div>
         <div class="field">
@@ -352,7 +353,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
             <div class="tip" id="tip" hidden></div>
           </div>
           <div class="titleblock">
-            <div class="legend"><span><i class="sw b"></i>Local 327</span><span><i class="sw o"></i>Local 328</span><span><i class="sw sq"></i>Union halls</span><span>Dark ring: visited</span></div>
+            <div class="legend"><span><i class="sw b"></i>Local 327 area</span><span><i class="sw o"></i>Local 328 area</span><span><i class="sw sq"></i>Union halls</span><span>Dark ring: visited</span></div>
             <div id="tb-date">Sheet 1 of 1</div>
           </div>
         </div>
@@ -658,6 +659,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
     if (R.siteYou === "mixed") chips.push('<span class="chip warn">Mixed crews (you)</span>');
     if (L.status === "visited") chips.push('<span class="chip done">Visited' + (L.date ? " " + esc(fmtDate(L.date)) : "") + "</span>");
     else if (L.status) chips.push('<span class="chip ' + (L.status === "follow" ? "warn" : "") + '">' + esc(VISIT_LABEL[L.status] || L.status) + "</span>");
+    if (!(R.project || R.union || R.open || R.you || R.siteYou)) chips.push('<span class="chip stage" title="No public record of union status was found for this site">Union status not verified</span>');
     if (s.coo && (!s.approved || s.coo >= s.approved)) chips.push('<span class="chip warn" title="An occupancy permit was issued for this project">Occupancy permit ' + esc(fmtDate(s.coo)) + "</span>");
 
     const facts = [];
@@ -694,7 +696,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
     if (L.updatedAt) more.push('<p class="src">Your log last saved ' + esc(fmtDate(L.updatedAt)) + "</p>");
 
     return '<article class="card' + (s.id === selectedId ? " is-sel" : "") + '" id="c-' + esc(s.id) + '" data-id="' + esc(s.id) + '" data-local="' + esc(s.local) + '">' +
-      '<div class="card-top"><span class="local-chip">Local ' + esc(s.local) + "</span><span>" + esc(areaLabel(s)) + "</span></div>" +
+      '<div class="card-top"><span class="local-chip">Local ' + esc(s.local) + " area</span><span>" + esc(areaLabel(s)) + "</span></div>" +
       "<h3>" + esc(s.name) + "</h3>" +
       '<p class="addr">' + esc(s.address) + "</p>" +
       '<div class="chips">' + chips.join("") + "</div>" +
@@ -727,20 +729,32 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
   }
   function renderSummary(list) {
     const all = allSites();
-    let c327 = 0, c328 = 0, union = 0, open = 0, visited = 0;
+    let c327 = 0, c328 = 0, union = 0, open = 0, unverified = 0, visited = 0;
     for (const s of list) {
       if (s.local === "327") c327++; else c328++;
       const R = siteRecords(s);
       if (R.project === "union" || R.union || R.you || R.siteYou === "union") union++;
-      if (R.project === "open" || R.siteYou === "open") open++;
+      if (!(R.project === "union" || R.union || R.you || R.siteYou === "union") && (R.project === "open" || R.siteYou === "open" || R.open)) open++;
+      if (!(R.project || R.union || R.open || R.you || R.siteYou)) unverified++;
       const L = logs.get(s.id) || {};
       if (L.status === "visited") visited++;
     }
     $("#summary").innerHTML =
       "<span>Showing <b>" + list.length + "</b> of <b>" + all.length + "</b> sites</span>" +
-      "<span><b>" + c327 + "</b> Local 327</span><span><b>" + c328 + "</b> Local 328</span>" +
+      "<span><b>" + c327 + "</b> in Local 327 area</span><span><b>" + c328 + "</b> in Local 328 area</span>" +
       "<span><b>" + union + "</b> with a union record</span><span><b>" + open + "</b> open shop record</span>" +
-      "";
+      "<span><b>" + unverified + "</b> not verified</span>";
+    renderUnionNote(all);
+  }
+  function renderUnionNote(all) {
+    let union = 0, open = 0, unverified = 0;
+    for (const s of all) {
+      const R = siteRecords(s);
+      if (R.project === "union" || R.union || R.you || R.siteYou === "union") union++;
+      else if (R.project === "open" || R.siteYou === "open" || R.open) open++;
+      else if (!(R.project || R.siteYou)) unverified++;
+    }
+    $("#union-note").innerHTML = "<strong>Most sites here are not confirmed union.</strong> Of " + all.length + " sites, " + union + " have a union record, " + open + " have an open shop record, and " + unverified + " have no public record of union status. \"Local 327 area\" or \"Local 328 area\" means the site is in that local's territory, not that the job is union. To confirm a job, check the job sign or call the local office on the Locals tab.";
   }
   function renderActiveFilters() {
     const box = $("#active-filters");

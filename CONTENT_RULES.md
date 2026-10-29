@@ -1,6 +1,7 @@
 # Content rules and project notes
 
-This is the public Boston Carpentry Site Tracker for YouthBuild Boston's resource
+This is the public site "Construction Sites in Carpenters Local 327 and 328 Territory"
+(repository 327-328-site-tracker) for YouthBuild Boston's resource
 page: a list and map of active construction sites in Carpenters Local 327 and
 Local 328 territory, with contractor union records from Boston Employment
 Commission (BEC) documents.
@@ -9,6 +10,11 @@ Commission (BEC) documents.
 
 - Every active site belongs on the page, union or not. Labels appear only where a
   public record supports them.
+- Unverified union status must be easy to see. Keep the "Union status not
+  verified" label on every site without a record, the counts notice at the top
+  of the page, and "Local 327 area" / "Local 328 area" wording (a site's local
+  means its territory, not that the job is union). Do not rename the page to
+  anything that suggests every site is union.
 - Write only what a source says. Never infer union status. A project label
   ("Union", "Open Shop") is not proof that a contractor is signatory; say
   "on a project listed as Union" unless the document says "signatory".
