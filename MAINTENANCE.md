@@ -19,7 +19,7 @@ Detailed steps behind WEEKLY_TASK.md. A person can follow them by hand too.
 ## 2. Add new Boston Employment Commission records
 
 The BEC page lists hearing minutes and links each monthly agenda:
-https://www.boston.gov/departments/small-business-development/boston-employment-commission
+https://www.boston.gov/government/cabinets/worker-empowerment/boston-employment-commission
 
 1. Find minutes or agendas newer than the newest one in the `BEC` dictionary in
    `scripts/build_data.py`.

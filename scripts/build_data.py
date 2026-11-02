@@ -102,6 +102,7 @@ BEC = {
     "a2026-07": ("BEC agenda, July 15, 2026", "https://www.boston.gov/sites/default/files/file/2026/07/BECH.7.13.2026.pdf", "2026-07-15"),
     "a2026-08": ("BEC agenda, Aug 19, 2026", "https://www.boston.gov/sites/default/files/file/2026/08/Employment.8.3.2026.pdf", "2026-08-19"),
     "a2026-09": ("BEC agenda, Sept 16, 2026", "https://search.boston.gov/sites/default/files/file/2026/09/September%2016%2C%202026%5ELJ_BEC%20Agenda_Public%20Notice.docx.pdf", "2026-09-16"),
+    "a2026-10": ("BEC agenda, Oct 21, 2026", "https://www.boston.gov/sites/default/files/file/2026/10/October%2021%2C%202026%5ELJ_BEC%20Agenda_Public%20Notice.docx%20%282%29.pdf", "2026-10-21"),
 }
 
 def ev(ref, text):
@@ -209,7 +210,7 @@ attach(3303, gc="Skanska",
        labor="union", laborNote="Described as a union project.", laborRef="m2025-01",
        bec=[ev("a2026-01", "Project review."), ev("m2025-01", "Skanska presented; three-year project, 25% complete, about 20 contractors.")])
 attach(4724, contractors=[C("Bond Building Construction", "Presented to the BEC")],
-       bec=[ev("a2026-09", "Project review (7278 White Stadium Renovation Project)."), ev("m2024-09", "Special presentation. East grandstand expected to finish at the end of 2026.")])
+       bec=[ev("a2026-10", "Project review (7278 White Stadium Renovation Project)."), ev("a2026-09", "Project review (7278 White Stadium Renovation Project)."), ev("m2024-09", "Special presentation. East grandstand expected to finish at the end of 2026.")])
 attach(3600, gc="RISE Construction Management",
        contractors=[C("Scorpions Contracting", "Drywall, rough framing, tape and paint, MEP"), C("G&C Concrete", "Concrete"), C("Sunrise Erectors", "Facade and glazing"), C("J. Derenzo Company", "Sitework")],
        bec=[ev("a2026-07", "Project review."), ev("m2025-01", "Construction scheduled Nov 2024 to Aug 25, 2026, with interiors through July 2026.")],
@@ -239,9 +240,9 @@ attach(4016, bec=[ev("a2026-02", "Project review (Boys & Girls Club Dorchester F
 attach(4186, bec=[ev("a2026-06", "Special presentation.")])
 attach(4631, bec=[ev("a2026-08", "Special presentation.")])
 attach(4298, bec=[ev("a2026-08", "Project review (Allston Post, 25-39 Harvard Ave.).")])
-attach(3333, bec=[ev("a2026-09", "Special presentation (14 Ellington St. and 8 Old Rd).")],
+attach(3333, bec=[ev("a2026-10", "Special presentation (14 Ellington St. and 8 Old Rd)."), ev("a2026-09", "Special presentation (14 Ellington St. and 8 Old Rd).")],
        developer="Harvard Street Neighborhood Health Center", notes=["City housing list: 14 Ellington / 8 Old Rd."])
-attach(4748, bec=[ev("a2026-09", "Special presentation (Mission Hill Pathway).")], developer="ODJ Dev LLC",
+attach(4748, bec=[ev("a2026-10", "Special presentation (Mission Hill Pathway)."), ev("a2026-09", "Special presentation (Mission Hill Pathway).")], developer="ODJ Dev LLC",
        notes=["City housing list: Mission Hill Pathway, 77 Terrace Street and 778-796 Parker Street."])
 attach(2594, notes=["City housing list also shows 127 Amory Street (The Community Builders) and Amory Greene (Urban Edge) in construction on Amory Street."])
 attach(4025, notes=["City housing list also shows NUBA Homes (Urbanica) in construction."], developer="Urbanica")
@@ -328,7 +329,7 @@ extra.append(manual("bos-whb-ballou", "Welcome Home Boston Phase II: Ballou / Se
 extra.append(manual("bos-whb-erie", "Welcome Home Boston Phase I: Erie / Glenway", "Erie Street and Glenway Street, Boston, MA 02121", "Roxbury", "327",
     None, None, "Under construction", "bosHousing", SRC["bosHousing"]["url"], "City housing list",
     developer="African Community Economic Development of New England (ACEDONE)", desc="City-supported homeownership on city-owned lots.",
-    bec=[ev("a2026-09", "Project review (Erie Glenway Street).")], notes=["Lot numbers not published. Look for the job sign on these streets."]))
+    bec=[ev("a2026-10", "Project review (Erie Glenway, Special/Review)."), ev("a2026-09", "Project review (Erie Glenway Street).")], notes=["Lot numbers not published. Look for the job sign on these streets."]))
 for e in extra:
     if e["id"] in by_id:  # the Planning Dept. list caught up; merge the manual record into the live one
         live = by_id[e["id"]]

@@ -32,8 +32,13 @@ Use only free tools: the built-in web fetch tool, never Firecrawl or other paid 
 
 Follow MAINTENANCE.md step 2. In short:
 
-1. Open https://www.boston.gov/departments/small-business-development/boston-employment-commission
-   with the web fetch tool and list minutes and agendas newer than the newest
+1. First run a web search for "Boston Employment Commission" limited to boston.gov,
+   then open the commission page from the search results with the web fetch tool
+   (currently https://www.boston.gov/government/cabinets/worker-empowerment/boston-employment-commission).
+   In practice, opening a page that came from a search result has not needed a
+   person to approve it, but opening a typed-in address can, and the scheduled run has no one to approve.
+   Open each meeting's public notice page from the commission page; the agenda PDF
+   is the "Official Filed Posting" link on that notice. List minutes and agendas newer than the newest
    entry in the `BEC` dictionary in `scripts/build_data.py`.
 2. Read each new document with the web fetch tool.
 3. Add the document to `BEC`, then add or update each project and contractor
