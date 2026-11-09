@@ -1,7 +1,7 @@
 {
   "result": "ok",
-  "ranAt": "2026-11-02T18:07:04+00:00",
-  "trigger": "push",
-  "runUrl": "https://github.com/Kai-YBB/327-328-site-tracker/actions/runs/41497432164",
+  "ranAt": "2026-11-09T11:01:37+00:00",
+  "trigger": "schedule",
+  "runUrl": "https://github.com/Kai-YBB/327-328-site-tracker/actions/runs/42605602791",
   "logTail": "wrote /home/runner/work/327-328-site-tracker/327-328-site-tracker/data/sites.json\nsites 158 {'Boston': 109, 'Cambridge': 33, 'Somerville': 16} Counter({'327': 88, '328': 70})\nlabor Counter({None: 149, 'open': 6, 'union': 3})\n"
 }
