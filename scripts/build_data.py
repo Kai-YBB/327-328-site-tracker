@@ -103,6 +103,7 @@ BEC = {
     "a2026-08": ("BEC agenda, Aug 19, 2026", "https://www.boston.gov/sites/default/files/file/2026/08/Employment.8.3.2026.pdf", "2026-08-19"),
     "a2026-09": ("BEC agenda, Sept 16, 2026", "https://search.boston.gov/sites/default/files/file/2026/09/September%2016%2C%202026%5ELJ_BEC%20Agenda_Public%20Notice.docx.pdf", "2026-09-16"),
     "a2026-10": ("BEC agenda, Oct 21, 2026", "https://www.boston.gov/sites/default/files/file/2026/10/October%2021%2C%202026%5ELJ_BEC%20Agenda_Public%20Notice.docx%20%282%29.pdf", "2026-10-21"),
+    "a2026-11": ("BEC agenda, Nov 18, 2026", "https://content.boston.gov/sites/default/files/file/2026/11/BEC.11.9.2026.pdf", "2026-11-18"),
 }
 
 def ev(ref, text):
@@ -244,6 +245,10 @@ attach(3333, bec=[ev("a2026-10", "Special presentation (14 Ellington St. and 8 O
        developer="Harvard Street Neighborhood Health Center", notes=["City housing list: 14 Ellington / 8 Old Rd."])
 attach(4748, bec=[ev("a2026-10", "Special presentation (Mission Hill Pathway)."), ev("a2026-09", "Special presentation (Mission Hill Pathway).")], developer="ODJ Dev LLC",
        notes=["City housing list: Mission Hill Pathway, 77 Terrace Street and 778-796 Parker Street."])
+attach(4638, labor="open", laborNote="Listed as Open Shop (project name: Modera Allston).", laborRef="a2026-11",
+       bec=[ev("a2026-11", "Project review (Hybrids), listed as Open Shop (Modera Allston, Special/Review).")],
+       developer="Mill Creek Residential",
+       notes=["Mill Creek Residential press release (Feb 2026): Modera Allston, 240 homes at 250 Everett Street, has broken ground. First move-ins expected early 2028."])
 attach(2594, notes=["City housing list also shows 127 Amory Street (The Community Builders) and Amory Greene (Urban Edge) in construction on Amory Street."])
 attach(4025, notes=["City housing list also shows NUBA Homes (Urbanica) in construction."], developer="Urbanica")
 attach(4301, notes=["City housing list: Brooke House at Olmsted Village (2Life Communities)."])
@@ -576,6 +581,8 @@ names_only = [
     {"name": "Dorchester Community Center (city project 7291)", "area": "Dorchester", "local": "327", "who": "City of Boston", "ref": "a2026-04", "what": "Special presentation"},
     {"name": "Talbot Commons Phase Two (two sites in South Dorchester)", "area": "Dorchester", "local": "327", "who": "Codman Square NDC", "ref": "a2026-06", "what": "Project review"},
     {"name": "Engine 17 Phase II (city project 7309)", "area": "Dorchester", "local": "327", "who": "City of Boston", "ref": "a2026-07", "what": "Project review"},
+    {"name": "McKinney Playground", "area": "Brighton, Faneuil Street", "local": "328", "who": "Boston Parks and Recreation project", "ref": "a2026-11", "what": "Special presentation, listed as Non-Union"},
+    {"name": "Mary Ellen Greenway", "area": "East Boston", "local": "328", "who": "The city's Mary Ellen Welch Greenway project (Parks and Recreation) shows construction from March to about December 2026", "ref": "a2026-11", "what": "Project review (Hybrids), listed as Open Shop"},
 ]
 for n in names_only:
     lab, url, date = BEC[n["ref"]]

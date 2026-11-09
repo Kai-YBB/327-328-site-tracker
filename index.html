@@ -952,7 +952,7 @@ legend { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; 
     $("#namesonly").innerHTML = DATA.namesOnly.map((n) => "<li><strong>" + esc(n.name) + "</strong>, " + esc(n.area) + " (Local " + esc(n.local) + "). " + esc(n.who) + '. <span class="src">' + esc(n.what) + ', <a href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.src) + "</a></span></li>").join("");
     $("#uncovered").textContent = "Open project data was not pulled for these towns, so they have no sites yet. Local 327: " + DATA.uncovered["327"].join(", ") + ". Local 328: " + DATA.uncovered["328"].join(", ") + ".";
     const srcs = Object.values(DATA.sources).map((s) => '<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.label) + "</a>, pulled " + esc(fmtDate(s.date)) + "</li>");
-    srcs.push("<li>Boston Employment Commission hearing minutes (July 2024 to June 2025) and agendas (January to September 2026), linked on each site and contractor.</li>");
+    srcs.push("<li>Boston Employment Commission hearing minutes (July 2024 to June 2025) and agendas (January to November 2026), linked on each site and contractor.</li>");
     srcs.push('<li>Local office details from <a href="https://www.nasrcc.org/find-a-local/" target="_blank" rel="noopener">NASRCC Find a Local</a>. Map outlines from the US Census Bureau and the Boston Planning Department.</li>');
     $("#sources").innerHTML = srcs.join("");
     $("#tools").innerHTML = DATA.otherTools.map((t) => '<li><a href="' + esc(t.url) + '" target="_blank" rel="noopener">' + esc(t.name) + "</a>: " + esc(t.what) + "</li>").join("");
